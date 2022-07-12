@@ -30,7 +30,7 @@ const init = async () => {
       choices: [
         "View Departments, Roles or Employees",
         "Add A Department, Role or Employee",
-        "Update An Employee Role or Manager",
+        "Update An Employee's Role or Manager",
         "Delete A Department, Role or Employee",
         "Exit Program",
       ],
@@ -309,17 +309,17 @@ const empAdd = async () => {
   console.log("Add an employee");
   try {
     db.query("SELECT * FROM role;", (err, res) => {
+      if (err) throw err;
       let roles = res.map((role) => ({
         name: role.title,
         value: role.role_id,
       }));
-      if (err) throw err;
       db.query("SELECT * FROM employee;", async (err, res) => {
+        if (err) throw err;
         let employees = res.map((employee) => ({
-          name: (employee.first_name = " " + employee.last_name),
+          name: employee.first_name = " " + employee.last_name,
           value: employee.employee_id,
         }));
-        if (err) throw err;
         let staff = await inquirer.prompt([
           {
             type: "input",
@@ -362,9 +362,85 @@ const empAdd = async () => {
   }
 };
 
-// const updateRole
+const updateRole = async () => {
+    console.log('Update an employee')
+    try {
+        db.query('SELECT * FROM role;', (err, res) => {
+            if (err) throw err;
+            let roles = res.map(role => ({name: role.title, value: role.role_id}))
+            db.query('SELECT * FROM employee;', async (err, res) => {
+                if (err) throw err;
+                let employees = res.map(employee => ({name: employee.first_name = " " + employee.last_name, value: employee.employee_id}))
+                let newRole = await inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'employee',
+                        message: 'Choose employee to update role for',
+                        choices: employees
+                    },{
+                        type: 'list',
+                        name: 'nRole',
+                        message: 'Choose a new role for employee',
+                        choices: roles
+                    }
+                ])
+                answers = db.query ('UPDATE employee SET ? WHERE ?',
+                [
+                    {
+                        role_id: newRole.nRole,
+                    },{
+                        employee_id: newRole.employee
+                    },
+                ],)
+                console.log ('Role successfully updated.\n')
+                updateMenu()
+            })
+        })
+    } catch (err) {
+        console.log(err.message)
+        updateMenu()
+    }
+}
 
-// const updateManager
+// const updateManager = async () => {
+//     console.log(`Update an employee's manager`)
+//     try {
+
+//     } catch (err) {
+//         console.log(err.message)
+//         updateMenu()
+//     }
+// }
+
+// const deptDelete = async () => {
+//     console.log('Delete a department')
+//     try {
+
+//     } catch (err) {
+//         console.log(err.message)
+//         updateMenu()
+//     }
+// }
+
+// const roleDelete = async () => {
+//     console.log('Delete a role')
+//     try {
+
+//     } catch (err) {
+//         console.log(err.message)
+//         updateMenu()
+//     }
+// }
+
+// const empDelete = async () => {
+//     console.log('Delete an employee')
+//     try {
+
+//     } catch (err) {
+//         console.log(err.message)
+//         updateMenu()
+//     }
+// }
 
 // const deptDelete
 
