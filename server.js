@@ -3,6 +3,7 @@ const bluebird = require("bluebird");
 const inquirer = require("inquirer");
 const consoleTable = require("console.table");
 const express = require("express");
+const { response } = require("express");
 
 const PORT = process.env.PORT || 8080;
 // const app = express()
@@ -269,8 +270,9 @@ const roleAdd = async () => {
     db.query("SELECT * FROM department;", async (err, res) => {
       let departments = res.map((department) => ({
         name: department.department_name,
-        value: department.department_id,
+        value: department.id,
       }));
+    
       if (err) throw err;
 
       let job = await inquirer.prompt([
@@ -312,13 +314,13 @@ const empAdd = async () => {
       if (err) throw err;
       let roles = res.map((role) => ({
         name: role.title,
-        value: role.role_id,
+        value: role.id,
       }));
       db.query("SELECT * FROM employee;", async (err, res) => {
         if (err) throw err;
         let employees = res.map((employee) => ({
           name: employee.first_name = " " + employee.last_name,
-          value: employee.employee_id,
+          value: employee.id,
         }));
         let staff = await inquirer.prompt([
           {
@@ -370,7 +372,7 @@ const updateRole = async () => {
             let roles = res.map(role => ({name: role.title, value: role.role_id}))
             db.query('SELECT * FROM employee;', async (err, res) => {
                 if (err) throw err;
-                let employees = res.map(employee => ({name: employee.first_name = " " + employee.last_name, value: employee.employee_id}))
+                let employees = res.map(employee => ({name: employee.first_name = " " + employee.last_name, value: employee.id}))
                 let newRole = await inquirer.prompt([
                     {
                         type: 'list',
@@ -402,25 +404,74 @@ const updateRole = async () => {
     }
 }
 
-// const updateManager = async () => {
-//     console.log(`Update an employee's manager`)
-//     try {
+const updateManager = async () => {
+    console.log(`Update an employee's manager`)
+    try {
+        db.query('SELECT * FROM employee;', async (err, res) => {
+            if (err) throw err;
+            let employees = res.map(employee => ({name: employee.first_name = " " + employee.last_name, value: employee.id}));
+            let newManager = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employee',
+                    message: 'Choose employee to update the manager for',
+                    choices: employees
+                },{
+                    type: 'list',
+                    name: 'newManager',
+                    message: 'Choose their new manager',
+                    choices: employees
+                }
+            ])
+            answers = db.query ('UPDATE employee SET ? WHERE ?',
+            [
+                {
+                    manager_id: newManager.newManager,
+                },{
+                    id: newManager.employee,
+                },
+            ])
+            console.log('Manager successfully updated.\n')
+            updateMenu()
+        })
+    } catch (err) {
+        console.log(err.message)
+        updateMenu()
+    }
+}
 
-//     } catch (err) {
-//         console.log(err.message)
-//         updateMenu()
-//     }
-// }
-
-// const deptDelete = async () => {
-//     console.log('Delete a department')
-//     try {
-
-//     } catch (err) {
-//         console.log(err.message)
-//         updateMenu()
-//     }
-// }
+const deptDelete = () => {
+    console.log('Delete a department')
+    try {
+        db.query('SELECT * FROM department ORDER BY id ASC;', async (err, res) => {
+            if (err) throw err;
+            let departments = res.map(department => ({name: department.department_name, value: department.id}))
+            let deletedDept = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'deptName',
+                    message: 'Choose a department to remove',
+                    choices: departments + "Oh wait, I fucked up"
+                }    
+            ])
+            if (answers === "Oh wait, I fucked up") {
+                console.log(`You're an idiot.\n`)
+            deleteMenu() 
+            }
+            answers = db.query ('DELETE FROM department WHERE ?',
+            [
+                {
+                    id: deletedDept.deptName,
+                }
+            ])
+            console.log('Department successfully deleted.\n')
+            deleteMenu()    
+        })
+    } catch (err) {
+        console.log(err.message)
+        deleteMenu()
+    }
+}
 
 // const roleDelete = async () => {
 //     console.log('Delete a role')
