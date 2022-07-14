@@ -44,7 +44,8 @@ const init = async () => {
       case "Add A Department, Role or Employee":
         addsMenu();
         break;
-      case "Update An Employee Role or Manager":
+      case "Update An Employee's Role or Manager":
+        console.log("go to update menu")
         updateMenu();
         break;
       case "Delete A Department, Role or Employee":
@@ -473,25 +474,71 @@ const deptDelete = () => {
     }
 }
 
-// const roleDelete = async () => {
-//     console.log('Delete a role')
-//     try {
+const roleDelete = async () => {
+    console.log('Delete a role')
+    try {
+        db.query('SELECT * FROM role ORDER BY id ASC;', async (err, res) => {
+            if (err) throw err;
+            let roles = res.map(role => ({name: role.title, value: role.id}))
+            let deletedRole = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'title',
+                    message: 'Choose a role to remove',
+                    choices: roles + "Oh wait, I fucked up"
+                }    
+            ])
+            if (answers === "Oh wait, I fucked up") {
+                console.log(`You're an idiot.\n`)
+            deleteMenu() 
+            }
+            answers = db.query ('DELETE FROM role WHERE ?',
+            [
+                {
+                    id: deletedRole.title,
+                }
+            ])
+            console.log('Role successfully deleted.\n')
+            deleteMenu()    
+        })
+    } catch (err) {
+        console.log(err.message)
+        deleteMenu()
+    }
+}
 
-//     } catch (err) {
-//         console.log(err.message)
-//         updateMenu()
-//     }
-// }
-
-// const empDelete = async () => {
-//     console.log('Delete an employee')
-//     try {
-
-//     } catch (err) {
-//         console.log(err.message)
-//         updateMenu()
-//     }
-// }
+const empDelete = async () => {
+    console.log('Delete an employee')
+    try {
+        db.query('SELECT * FROM employee ORDER BY id ASC;', async (err, res) => {
+            if (err) throw err;
+            let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}))
+            let deletedEmp = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employee',
+                    message: 'Choose an employee to remove',
+                    choices: employees + "Oh wait, I fucked up"
+                }    
+            ])
+            if (answers === "Oh wait, I fucked up") {
+                console.log(`You're an idiot.\n`)
+            deleteMenu() 
+            }
+            answers = db.query ('DELETE FROM employee WHERE ?',
+            [
+                {
+                    id: deletedEmp.employee,
+                }
+            ])
+            console.log('Employee successfully deleted.\n')
+            deleteMenu()    
+        })
+    } catch (err) {
+        console.log(err.message)
+        updateMenu()
+    }
+}
 
 // const deptDelete
 
