@@ -4,10 +4,16 @@ const inquirer = require("inquirer");
 const consoleTable = require("console.table");
 const express = require("express");
 const { response } = require("express");
+const plus = require('./routes/adds')
+const minus = require('./routes/deletes')
+const menus = require('./routes/menus')
+const update = require('./routes/updates')
+const viewed = require('./routes/views')
 
 const PORT = process.env.PORT || 8080;
 // const app = express()
 
+// Create a connection
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -15,6 +21,7 @@ const db = mysql.createConnection({
   database: "employee_db",
 });
 
+// Call app start
 db.connect(function (err) {
   if (err) throw err;
   init();
@@ -22,6 +29,7 @@ db.connect(function (err) {
 
 console.table("~~~-----EMPLOYEE TRACKER-----~~~");
 
+// Main menu function
 const init = async () => {
   try {
     let question = await inquirer.prompt({
@@ -61,6 +69,7 @@ const init = async () => {
   }
 };
 
+// View menu function
 const viewsMenu = async () => {
   try {
     let question = await inquirer.prompt({
@@ -95,6 +104,7 @@ const viewsMenu = async () => {
   }
 };
 
+// Addition menu function
 const addsMenu = async () => {
   try {
     let question = await inquirer.prompt({
@@ -129,6 +139,7 @@ const addsMenu = async () => {
   }
 };
 
+// Update menu function
 const updateMenu = async () => {
   try {
     let question = await inquirer.prompt({
@@ -159,6 +170,7 @@ const updateMenu = async () => {
   }
 };
 
+// Delete menu function
 const deleteMenu = async () => {
   try {
     let question = await inquirer.prompt({
@@ -193,6 +205,7 @@ const deleteMenu = async () => {
   }
 };
 
+// View department table
 const deptView = async () => {
   console.log("Department View");
   try {
@@ -210,6 +223,7 @@ const deptView = async () => {
   }
 };
 
+// View role table
 const roleView = async () => {
   console.log("Role View");
   try {
@@ -227,6 +241,7 @@ const roleView = async () => {
   }
 };
 
+// View employee table
 const empView = async () => {
   console.log("Employee View");
   try {
@@ -244,6 +259,7 @@ const empView = async () => {
   }
 };
 
+// Add a department
 const deptAdd = async () => {
   console.log("Add a Department");
   try {
@@ -265,6 +281,7 @@ const deptAdd = async () => {
   }
 };
 
+// Add a role
 const roleAdd = async () => {
   console.log("Add a Role");
   try {
@@ -308,6 +325,7 @@ const roleAdd = async () => {
   }
 };
 
+// Add an employee
 const empAdd = async () => {
   console.log("Add an employee");
   try {
@@ -365,46 +383,55 @@ const empAdd = async () => {
   }
 };
 
+// Update a role
 const updateRole = async () => {
     console.log('Update an employee')
     try {
-        db.query('SELECT * FROM role;', (err, res) => {
-            if (err) throw err;
-            let roles = res.map(role => ({name: role.title, value: role.role_id}))
-            db.query('SELECT * FROM employee;', async (err, res) => {
-                if (err) throw err;
-                let employees = res.map(employee => ({name: employee.first_name = " " + employee.last_name, value: employee.id}))
-                let newRole = await inquirer.prompt([
-                    {
-                        type: 'list',
-                        name: 'employee',
-                        message: 'Choose employee to update role for',
-                        choices: employees
-                    },{
-                        type: 'list',
-                        name: 'nRole',
-                        message: 'Choose a new role for employee',
-                        choices: roles
-                    }
-                ])
-                answers = db.query ('UPDATE employee SET ? WHERE ?',
-                [
-                    {
-                        role_id: newRole.nRole,
-                    },{
-                        employee_id: newRole.employee
-                    },
-                ],)
-                console.log ('Role successfully updated.\n')
-                updateMenu()
-            })
+      db.query('SELECT * FROM role;', (err, res) => {
+        // console.log('roles: ', res)
+
+        let roleChoices = res.map(role => ({name: role.title, value: role.role_id}))
+        db.query('SELECT * FROM employee;', async (e, r) => {
+
+          // console.log('employees: ', r)
+
+          let employeeChoices = r.map(employee => ({name: employee.first_name = " " + employee.last_name, value: employee.id}))
+
+          let newRole = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: 'Choose employee to update role for',
+                choices: employeeChoices
+            },{
+                type: 'list',
+                name: 'nRole',
+                message: 'Choose a new role for employee',
+                choices: roleChoices
+            }
+        ])
+        // console.log('newRole: ', newRole)
+         db.query ('UPDATE employee SET ? WHERE ?',
+        [
+            {
+                role_id: newRole.nRole,
+            },{
+                id: newRole.employee
+            },
+        ], (er, re) => {
+          // console.log('answers: ', re)
+          console.log ('Role successfully updated.\n')
+          updateMenu()
         })
+        })
+      })   
     } catch (err) {
         console.log(err.message)
         updateMenu()
     }
 }
 
+// **Extra Credit** - Update employee's manager
 const updateManager = async () => {
     console.log(`Update an employee's manager`)
     try {
@@ -441,6 +468,7 @@ const updateManager = async () => {
     }
 }
 
+// **Extra Credit** - Delete a department
 const deptDelete = () => {
     console.log('Delete a department')
     try {
@@ -452,13 +480,9 @@ const deptDelete = () => {
                     type: 'list',
                     name: 'deptName',
                     message: 'Choose a department to remove',
-                    choices: departments + "Oh wait, I fucked up"
+                    choices: departments
                 }    
             ])
-            if (answers === "Oh wait, I fucked up") {
-                console.log(`You're an idiot.\n`)
-            deleteMenu() 
-            }
             answers = db.query ('DELETE FROM department WHERE ?',
             [
                 {
@@ -474,6 +498,7 @@ const deptDelete = () => {
     }
 }
 
+// **Extra Credit** - Delete a role
 const roleDelete = async () => {
     console.log('Delete a role')
     try {
@@ -485,13 +510,10 @@ const roleDelete = async () => {
                     type: 'list',
                     name: 'title',
                     message: 'Choose a role to remove',
-                    choices: roles + "Oh wait, I fucked up"
+                    choices: roles
                 }    
             ])
-            if (answers === "Oh wait, I fucked up") {
-                console.log(`You're an idiot.\n`)
-            deleteMenu() 
-            }
+
             answers = db.query ('DELETE FROM role WHERE ?',
             [
                 {
@@ -507,6 +529,7 @@ const roleDelete = async () => {
     }
 }
 
+// **Extra Credit** - Delete an employee
 const empDelete = async () => {
     console.log('Delete an employee')
     try {
@@ -518,13 +541,10 @@ const empDelete = async () => {
                     type: 'list',
                     name: 'employee',
                     message: 'Choose an employee to remove',
-                    choices: employees + "Oh wait, I fucked up"
+                    choices: employees
                 }    
             ])
-            if (answers === "Oh wait, I fucked up") {
-                console.log(`You're an idiot.\n`)
-            deleteMenu() 
-            }
+
             answers = db.query ('DELETE FROM employee WHERE ?',
             [
                 {
@@ -539,33 +559,3 @@ const empDelete = async () => {
         updateMenu()
     }
 }
-
-// const deptDelete
-
-// const roleDelete
-
-// const empDelete
-
-// view all departments,
-
-// view all roles,
-
-// view all employees,
-
-// add a department,
-
-// add a role,
-
-// add an employee
-
-// update an employee role
-
-// Bonus: Update employee managers
-
-// Bonus: View employees by manager
-
-// Bonus: View employees by department
-
-// Bonus: Delete departments, roles and employees
-
-// Bonus: View total combined salaries in a departmen

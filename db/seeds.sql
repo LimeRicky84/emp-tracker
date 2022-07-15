@@ -7,12 +7,12 @@ VALUES ('Management'),
        ('Maintenance');
 
 INSERT INTO role (title, salary, department_id)
-VALUES ('Space Lord', 550000, ),
-       ('Sales Rep', 75000, ),
-       ('HR Officer', 45000, ),
-       ('Accountant', 85000, ),
-       ('Laborer', 500000, ),
-       ('Technician', 500000, );
+VALUES ('Space Lord', 550000, 1),
+       ('Sales Rep', 75000, 2),
+       ('HR Officer', 45000, 3),
+       ('Accountant', 85000, 4),
+       ('Laborer', 500000, 5),
+       ('Technician', 500000, 6);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Rick', 'Moss', 001, null),
