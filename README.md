@@ -2,7 +2,7 @@
 
 ## Description
 
-This is an app to help manage departments, roles and employees in a company. I added a couple extra credit options including updating an employee manager and deleting employees roles and departments
+This is an app to help manage departments, roles and employees in a company. I added a couple extra credit options including updating an employee's manager and deleting employees, roles and departments
 
 ## Usage
 
@@ -17,8 +17,8 @@ Video demonstration: https://www.youtube.com/watch?v=BeQVTR7ZDSg
 
 ## Screenshots
 
-![img]https://github.com/LimeRicky84/emp-tracker/blob/main/assets/trackerShot.jpg
+![img](https://github.com/LimeRicky84/emp-tracker/blob/main/assets/trackerShot.jpg)
 
-![img]https://github.com/LimeRicky84/emp-tracker/blob/main/assets/trackerShot2.jpg
+![img](https://github.com/LimeRicky84/emp-tracker/blob/main/assets/trackerShot2.jpg)
 
-![img]https://github.com/LimeRicky84/emp-tracker/blob/main/assets/trackerShot3.jpg
+![img](https://github.com/LimeRicky84/emp-tracker/blob/main/assets/trackerShot3.jpg)
